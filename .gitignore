@@ -41,6 +41,5 @@ android/BeyondAR_Examples/src-googlemaps/
 android/BeyondAR_Examples/src-radar/
 
 # Gradle
-.gradle/
-gradle/
+.gradle
 build/
