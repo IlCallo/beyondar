@@ -233,6 +233,38 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback, C
 		return optimalSize;
 	}
 
+	public Camera.Parameters configureCameraParameters(Camera camera, int width, int height) {
+        stopPreviewCamera();
+
+        Camera.Parameters parameters = camera.getParameters();
+
+        int orientation = 0;
+
+        if (Build.VERSION.SDK_INT < 9) {
+            if (isPortrait()) {
+                parameters.set(CAMERA_PARAM_ORIENTATION, CAMERA_PARAM_PORTRAIT);
+                orientation = 90;
+            } else {
+                parameters.set(CAMERA_PARAM_ORIENTATION, CAMERA_PARAM_LANDSCAPE);
+                orientation = 0;
+            }
+        } else {
+            orientation = getCameraDisplayOrientation();
+            parameters.setRotation(orientation);
+        }
+        camera.setDisplayOrientation(orientation);
+
+        parameters.setPreviewSize(width, height);
+
+        // Fix for the first versions of google glass
+        if (GoogleGlassUtils.isGoogleGlass())
+        {
+            parameters.setPreviewFpsRange(30000, 30000);
+        }
+
+        return parameters;
+    }
+
 	@SuppressLint("NewApi")
 	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
 		if (mCamera == null) {
@@ -242,35 +274,9 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback, C
 		if (mCamera == null || mPreviewSize == null) {
 			return;
 		}
-		stopPreviewCamera();
-
-		Camera.Parameters parameters = mCamera.getParameters();
-
-		int orientation = 0;
-
-		if (Build.VERSION.SDK_INT < 9) {
-			if (isPortrait()) {
-				parameters.set(CAMERA_PARAM_ORIENTATION, CAMERA_PARAM_PORTRAIT);
-				orientation = 90;
-			} else {
-				parameters.set(CAMERA_PARAM_ORIENTATION, CAMERA_PARAM_LANDSCAPE);
-				orientation = 0;
-			}
-		} else {
-			orientation = getCameraDisplayOrientation();
-			parameters.setRotation(orientation);
-		}
-		mCamera.setDisplayOrientation(orientation);
-
-		parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
-
-		// Fix for the first versions of google glass
-		if (GoogleGlassUtils.isGoogleGlass())
-		{
-			parameters.setPreviewFpsRange(30000, 30000);
-		}
 		
-		mCamera.setParameters(parameters);
+		mCamera.setParameters(configureCameraParameters(mCamera, mPreviewSize.width, mPreviewSize.height));
+
 		startPreviewCamera();
 	}
 
@@ -400,6 +406,9 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback, C
 		while (!acquiredCam && timePassed < MAX_TIME_WAIT_FOR_CAMERA) {
 			try {
 				mCamera = Camera.open();
+
+                mCamera.setParameters(configureCameraParameters(mCamera, mPreviewSize.width, mPreviewSize.height));
+
 				Logger.v(TAG, "acquired the camera");
 				acquiredCam = true;
 				return true;

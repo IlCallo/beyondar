@@ -47,9 +47,17 @@ public class BeyondarObject implements Plugable<BeyondarObjectPlugin> {
 	private boolean mFaceToCamera;
 	private MeshCollider mMeshCollider;
 	private double mDistanceFromUser;
-	private Point3 mScreenPositionTopLeft, mScreenPositionTopRight, mScreenPositionBottomLeft,
-			mScreenPositionBottomRight, mScreenPositionCenter;
-	private Point3 mTopLeft, mBottomLeft, mBottomRight, mTopRight;
+
+	private Point3 mScreenPositionTopLeft;
+    private Point3 mScreenPositionTopRight;
+    private Point3 mScreenPositionBottomLeft;
+    private Point3 mScreenPositionBottomRight;
+    private Point3 mScreenPositionCenter;
+
+	private Point3 mTopLeft;
+    private Point3 mBottomLeft;
+    private Point3 mBottomRight;
+    private Point3 mTopRight;
 
 	/** This fields contains all the loaded plugins. */
 	protected List<BeyondarObjectPlugin> plugins;
@@ -318,11 +326,10 @@ public class BeyondarObject implements Plugable<BeyondarObjectPlugin> {
 	}
 
 	/**
-	 * Get the {@link com.beyondar.android.opengl.texture.Texture Texture} used
-	 * to render the {@link com.beyondar.android.world.BeyondarObject
-	 * BeyondarObject}.
+	 * Get the {@link Texture} used
+	 * to render the {@link BeyondarObject}.
 	 * 
-	 * @return {@link com.beyondar.android.opengl.texture.Texture Texture}
+	 * @return {@link Texture}
 	 *         object in use.
 	 */
 	public Texture getTexture() {
